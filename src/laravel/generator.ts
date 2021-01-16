@@ -1,4 +1,4 @@
-import { Column, GenerateConfig, History, Table } from "../lib/type";
+import { Column, ForeignKey, GenerateConfig, History, Table } from "../lib/type";
 import { Template } from "./template/template"
 import axios from "axios"
 import { FileMaker } from "./fileMaker"
@@ -120,6 +120,35 @@ export class LaravelGenerator {
 
                 if (columnChangeScript !== "") {
                     up += await new Template().changeTableTemplate(thisTable.properties.name, columnChangeScript)
+                }
+
+
+
+                let foreignKeyScript = ""
+                for await (const thisForeignKeyKey of Object.keys(thisTable.foreignKey)) {
+                    const thisForeignKey: ForeignKey = thisTable.foreignKey[thisForeignKeyKey]
+                    const oldForeignKey: ForeignKey = oldTable.foreignKey[thisForeignKeyKey]
+                    if (oldForeignKey === undefined) {
+                        console.log("ADD foregin key from old 99999999999999999999999999999999999999999999999999999")
+                        foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
+                        continue;
+                    }
+
+                    if ((oldForeignKey.name !== thisForeignKey.name) ||
+                        (oldForeignKey.columnIds[0] !== thisForeignKey.columnIds[0]) ||
+                        (oldForeignKey.refTableId !== oldForeignKey.refTableId) ||
+                        (oldForeignKey.refColumnIds[0] !== oldForeignKey.refColumnIds[0]) ||
+                        (oldForeignKey.onDelete !== oldForeignKey.onDelete) ||
+                        (oldForeignKey.onUpdate !== oldForeignKey.onUpdate)
+                    ) {
+                        console.log("ADD foregin key changeee 888888888888888888888888888888888888888888888888888888888")
+                        foreignKeyScript += await new Template().foreignKeyDelete(thisForeignKey)
+                        foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
+                    }
+                }
+
+                if (foreignKeyScript !== "") {
+                    up += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
                 }
 
             }

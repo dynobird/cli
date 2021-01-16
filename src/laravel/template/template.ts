@@ -103,6 +103,9 @@ export class Template {
         return columnScript;
     }
 
+    async foreignKeyDelete(foreginKey: ForeignKey) {
+        return `$table->dropForeign('${foreginKey.name}');\r\n             `;
+    }
     async foreignKeyAdd(foreignKey: ForeignKey, thisTable: Table, thisListTable: any) {
 
         let sourceColumn: Column = thisTable.column[foreignKey.columnIds[0]];
