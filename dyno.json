@@ -1,0 +1,8 @@
+{
+    "entitiesDir": "model",
+    "migrationsDir": "migration",
+    "framework": "laravel",
+    "version": "8",
+    "token": "c6013d42705038eace64673a9a19c641a5f3ced407dbc9623e33770128effec49d7f87f6775d21c8e48e6508368478fb13fb",
+    "tag": "*"
+}
