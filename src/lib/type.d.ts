@@ -3,7 +3,7 @@ export interface GenerateConfig {
     version: string
     token: string
     framework: string
-    migrationDir: string
+    migrationsDir: string
     entitiesDir: string
 }
 

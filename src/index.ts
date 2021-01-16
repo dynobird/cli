@@ -36,6 +36,11 @@ if (command === 'generate:migration') {
         console.error("key entitiesDir not found")
         process.exit(1)
     }
+
+    if (!dynoConfig.migrationsDir) {
+        console.error("key migrationDir not found")
+        process.exit(1)
+    }
     new Generator().migration(dynoConfig)
 }
 console.log(process.argv);

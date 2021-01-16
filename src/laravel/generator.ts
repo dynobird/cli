@@ -1,6 +1,7 @@
 import { Column, GenerateConfig, History, Table } from "../lib/type";
 import { Template } from "./template/template"
 import axios from "axios"
+import { FileMaker } from "./fileMaker"
 import {
     camelCase,
     capitalCase,
@@ -18,7 +19,7 @@ import moment from "moment"
 import fs from "fs"
 
 export class LaravelGenerator {
-    async migration(version: GenerateConfig) {
+    async migration(config: GenerateConfig) {
         console.log("DO migration for laravel")
         let historyList: History[];
         try {
@@ -99,7 +100,7 @@ export class LaravelGenerator {
             }
 
             let migrationScript = await new Template().migrationTemplate(migrationClassName, up, '');
-            fs.writeFileSync(`${migrationFileName}.php`, migrationScript);
+            await new FileMaker().makeMigration(config, migrationFileName, migrationScript);
         }
     }
 }
