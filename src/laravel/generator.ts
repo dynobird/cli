@@ -46,12 +46,25 @@ export class LaravelGenerator {
             console.log(migrationFileName)
             let up = ''
 
-
+            /**
+             * Create table and change column
+             */
             for await (const thisTableKey of Object.keys(thisHistory.design.table)) {
                 const thisTable: Table = thisHistory.design.table[thisTableKey]
                 if (thisHistoryKey === 0) {
                     console.log("for each 345345 MAKAN NGGAK MASUK")
                     up += await new Template().createTable(thisTable);
+
+                    let foreignKeyScript = ""
+                    for await (const thisForeignKeyKey of Object.keys(thisTable.foreignKey)) {
+                        const thisForeignKey = thisTable.foreignKey[thisForeignKeyKey]
+                        foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
+                        console.log("FOREIGN KEY SCRIPT_____________________________________________________________________________ ")
+                        console.log(foreignKeyScript)
+                    }
+                    if (foreignKeyScript !== "") {
+                        up += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
+                    }
                     continue
                 }
                 console.log("MAKANNNNNNNN")
@@ -60,6 +73,18 @@ export class LaravelGenerator {
 
                 if (oldTable === undefined) {
                     up += await new Template().createTable(thisTable);
+
+                    // ADD FOREIGN KEY
+                    let foreignKeyScript = ""
+                    for await (const thisForeignKeyKey of Object.keys(thisTable.foreignKey)) {
+                        const thisForeignKey = thisTable.foreignKey[thisForeignKeyKey]
+                        foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
+                        console.log("FOREIGN KEY ADD IN NOT EXIST TABLE_____________________________________________________________________________ ")
+                        console.log(foreignKeyScript)
+                    }
+                    if (foreignKeyScript !== "") {
+                        up += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
+                    }
                     continue
                 }
 
@@ -99,8 +124,9 @@ export class LaravelGenerator {
 
             }
 
+
             let migrationScript = await new Template().migrationTemplate(migrationClassName, up, '');
-            await new FileMaker().makeMigration(config, migrationFileName, migrationScript);
+            // await new FileMaker().makeMigration(config, migrationFileName, migrationScript);
         }
     }
 }

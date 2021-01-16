@@ -1,4 +1,4 @@
-import { Column, Table } from "../../lib/type";
+import { Column, ForeignKey, Table } from "../../lib/type";
 
 export class Template {
     makeTableTemplate(tableName: string, columnScript: string) {
@@ -103,6 +103,13 @@ export class Template {
         return columnScript;
     }
 
+    async foreignKeyAdd(foreignKey: ForeignKey, thisTable: Table, thisListTable: any) {
+
+        let sourceColumn: Column = thisTable.column[foreignKey.columnIds[0]];
+        let refTable: Table = thisListTable[foreignKey.refTableId]
+        let refColumn: Column = refTable.column[foreignKey.refColumnIds[0]]
+        return `$table->foreign('${sourceColumn.name}', '${foreignKey.name}')->references('${refColumn.name}')->on('${refTable.properties.name}');\r\n             `;
+    }
     async createTable(table: Table) {
         let tableName = table.properties.name;
         let columnScript = ""
