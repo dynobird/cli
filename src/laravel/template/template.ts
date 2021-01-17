@@ -200,9 +200,25 @@ export class Template {
         console.log("MASUKK")
 
         for await (const thisColumnKey of Object.keys(table.column)) {
-            let thisColumn = table.column[thisColumnKey]
+            let thisColumn: Column = table.column[thisColumnKey]
             columnScript += await this.addColumn(thisColumn);
         }
+
+
+        let primaryColumn = ""
+        for await (const thisColumnKey of Object.keys(table.column)) {
+            let thisColumn: Column = table.column[thisColumnKey]
+
+            if (thisColumn.primary === true && thisColumn.dataType !== 'id') {
+                primaryColumn += `'${thisColumn.name}', `
+            }
+        }
+
+        if (primaryColumn !== "") {
+            primaryColumn = primaryColumn.substring(0, primaryColumn.length - 2)
+            columnScript += `table->primary([${primaryColumn}]);\r\n             `
+        }
+
         return this.makeTableTemplate(tableName, columnScript)
     }
 
