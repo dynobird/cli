@@ -1,4 +1,4 @@
-import { Column, ForeignKey, Table } from "../../lib/type";
+import { Column, ForeignKey, Index, IndexColumn, Table } from "../../lib/type";
 
 export class Template {
     makeTableTemplate(tableName: string, columnScript: string) {
@@ -12,6 +12,32 @@ export class Template {
             ${columnChangeScript}
         });\r\n`;
     }
+    async indexRename(oldIndex: Index, thisIndex: Index) {
+        return `$table->renameIndex('${oldIndex.name}', '${thisIndex.name}');\r\n`;
+    }
+
+    async indexAdd(index: Index, columnList: any) {
+        let columnIndex = ''
+        for await (const indexColumnKey of Object.keys(index.column)) {
+            let thisIndexColumn: IndexColumn = index.column[indexColumnKey]
+            let thisColumn: Column = columnList[thisIndexColumn.id]
+            columnIndex += `'${thisColumn.name}', `
+        }
+        columnIndex = columnIndex.substring(0, columnIndex.length - 2)
+        if (index.type === 'INDEX') {
+            return `$table->index([${columnIndex}],'${index.name}');\r\n`;
+        } else if (index.type === 'UNIQUE') {
+            return `$table->unique([${columnIndex}],'${index.name}');\r\n`;
+        }
+    }
+    async indexDelete(index: Index) {
+        if (index.type === 'INDEX') {
+            return `$table->dropIndex('${index.name}');\r\n`;
+        } else if (index.type === 'UNIQUE') {
+            return `$table->dropIndex('${index.name}');\r\n`;
+        }
+    }
+
 
     renameTable(oldTable: Table, thisTable: Table) {
         return `Schema::rename('${oldTable.properties.name}', '${thisTable.properties.name}');\r\n`;

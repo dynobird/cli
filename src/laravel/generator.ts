@@ -1,4 +1,4 @@
-import { Column, ForeignKey, GenerateConfig, History, Table } from "../lib/type";
+import { Column, ForeignKey, GenerateConfig, History, Index, Table } from "../lib/type";
 import { Template } from "./template/template"
 import axios from "axios"
 import { FileMaker } from "./fileMaker"
@@ -45,7 +45,8 @@ export class LaravelGenerator {
             let migrationClassName = pascalCase(thisHistory.name)
             console.log(migrationFileName)
             let up = ''
-
+            let fullForeignKeyScript = "";
+            let fullIndexScript = "";
             /**
              * Create table and change column
              */
@@ -55,15 +56,26 @@ export class LaravelGenerator {
                     console.log("for each 345345 MAKAN NGGAK MASUK")
                     up += await new Template().createTable(thisTable);
 
+                    //create new foreignKey
                     let foreignKeyScript = ""
                     for await (const thisForeignKeyKey of Object.keys(thisTable.foreignKey)) {
                         const thisForeignKey = thisTable.foreignKey[thisForeignKeyKey]
                         foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
-                        console.log("FOREIGN KEY SCRIPT_____________________________________________________________________________ ")
                         console.log(foreignKeyScript)
                     }
                     if (foreignKeyScript !== "") {
-                        up += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
+                        fullForeignKeyScript += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
+                    }
+
+                    // create new index
+                    let indexScript: string = ""
+                    for await (const thisIndexKey of Object.keys(thisTable.index)) {
+                        let thisIndex = thisTable.index[thisIndexKey]
+                        indexScript += await new Template().indexAdd(thisIndex, thisTable.column)
+                    }
+                    if (indexScript !== "") {
+                        console.log("CREATE NEW INDEX_____________________________________________________________________________  0")
+                        up += await new Template().changeTableTemplate(thisTable.properties.name, indexScript)
                     }
                     continue
                 }
@@ -79,11 +91,21 @@ export class LaravelGenerator {
                     for await (const thisForeignKeyKey of Object.keys(thisTable.foreignKey)) {
                         const thisForeignKey = thisTable.foreignKey[thisForeignKeyKey]
                         foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
-                        console.log("FOREIGN KEY ADD IN NOT EXIST TABLE_____________________________________________________________________________ ")
                         console.log(foreignKeyScript)
                     }
                     if (foreignKeyScript !== "") {
-                        up += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
+                        fullForeignKeyScript += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
+                    }
+
+                    // ADD INDEX
+                    let indexScript = ""
+                    for await (const thisIndexKey of Object.keys(thisTable.index)) {
+                        let thisIndex = thisTable.index[thisIndexKey]
+                        indexScript += await new Template().indexAdd(thisIndex, thisTable.column)
+                    }
+                    if (indexScript !== "") {
+                        console.log("CREATE NEW INDEX_____________________________________________________________________________ ")
+                        up += await new Template().changeTableTemplate(thisTable.properties.name, indexScript)
                     }
                     continue
                 }
@@ -150,11 +172,63 @@ export class LaravelGenerator {
                 if (foreignKeyScript !== "") {
                     fullForeignKeyScript += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
                 }
+
+                let indexScript = ""
+                for await (const thisIndexKey of Object.keys(thisTable.index)) {
+                    let thisIndex: Index = thisTable.index[thisIndexKey]
+
+                    let oldIndex: Index = oldTable.index[thisIndexKey]
+
+                    if (oldIndex === undefined) {
+                        indexScript += await new Template().indexAdd(thisIndex, thisTable.column)
+                        continue;
+                    }
+
+                    let isIndexColumnChanged = false
+
+                    // detect additional column in index rule
+                    for await (const thisIndexColumnKey of Object.keys(thisIndex.column)) {
+                        if (oldIndex.column[thisIndexColumnKey] === undefined) {
+                            isIndexColumnChanged = true
+                            break;
+                        }
+                    }
+
+
+                    // detect removed column in index rule
+                    for await (const oldIndexColumnKey of Object.keys(oldIndex.column)) {
+                        if (thisIndex.column[oldIndexColumnKey] === undefined) {
+                            isIndexColumnChanged = true
+                            break;
+                        }
+                    }
+
+                    if ((oldIndex.name !== thisIndex.name) &&
+                        (oldIndex.type === thisIndex.type) &&
+                        (oldIndex.comment === oldIndex.comment) &&
+                        isIndexColumnChanged === false
+                    ) {
+                        indexScript += await new Template().indexRename(oldIndex, thisIndex)
+                    }
+                    else if ((oldIndex.type !== thisIndex.type) ||
+                        (oldIndex.comment !== thisIndex.comment) ||
+                        isIndexColumnChanged === true
+                    ) {
+                        indexScript += await new Template().indexDelete(oldIndex)
+                        indexScript += await new Template().indexAdd(thisIndex, thisTable.column)
+                    }
+                }
+
+                if (indexScript !== "") {
+                    fullIndexScript += await new Template().changeTableTemplate(thisTable.properties.name, indexScript)
+                }
+
             }
             up += fullForeignKeyScript
+            up += fullIndexScript;
 
             let migrationScript = await new Template().migrationTemplate(migrationClassName, up, '');
-            // await new FileMaker().makeMigration(config, migrationFileName, migrationScript);
+            await new FileMaker().makeMigration(config, migrationFileName, migrationScript);
         }
     }
 }
