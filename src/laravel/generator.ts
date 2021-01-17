@@ -251,6 +251,23 @@ export class LaravelGenerator {
                     if (dropIndexScript !== "") {
                         fullDeleteScript += await new Template().changeTableTemplate(oldTable.properties.name, dropIndexScript)
                     }
+
+
+                    // deleted column
+                    let dropColumnScript = ""
+                    for await (const oldColumnKey of Object.keys(oldTable.column)) {
+                        let thisColumn = thisTable.column[oldColumnKey]
+                        let oldColumn = oldTable.column[oldColumnKey]
+
+                        if (thisColumn === undefined) {
+                            fullDeleteScript += await new Template().dropForeignKeyByColumn(oldHistory.design.table, oldColumn)
+                            dropColumnScript += await new Template().columnDelete(oldColumn)
+                        }
+
+                    }
+                    if (dropColumnScript !== "") {
+                        fullDeleteScript += await new Template().changeTableTemplate(oldTable.properties.name, dropColumnScript)
+                    }
                 }
             }
 

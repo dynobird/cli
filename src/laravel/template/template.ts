@@ -7,6 +7,35 @@ export class Template {
         });\r\n`
     }
 
+    async columnDelete(column: Column) {
+        return `$table->dropColumn('${column.name}');\r\n`;
+    }
+    async dropForeignKeyByColumn(oldTableList: any, deletedColumn: Column) {
+        let scriptDelete = ""
+        for await (const oldTableKey of Object.keys(oldTableList)) {
+            let oldTable: Table = oldTableList[oldTableKey]
+            let scriptDeletedFKTable = "";
+            for await (const oldForeignKeyKey of Object.keys(oldTable.foreignKey)) {
+                let oldForeignKey: ForeignKey = oldTable.foreignKey[oldForeignKeyKey]
+                if (oldForeignKey.refColumnIds[0] === deletedColumn.id) {
+                    scriptDeletedFKTable += await this.foreignKeyDelete(oldForeignKey)
+                    continue;
+                }
+
+                if (oldForeignKey.columnIds[0] === deletedColumn.id) {
+                    scriptDeletedFKTable += await this.foreignKeyDelete(oldForeignKey)
+                    continue;
+                }
+            }
+
+
+            if (scriptDeletedFKTable !== "") {
+                scriptDelete += this.changeTableTemplate(oldTable.properties.name, scriptDeletedFKTable)
+            }
+        }
+        return scriptDelete
+    }
+
     async dropForeignKeyByTable(oldTableLIst: any, deletedTable: Table) {
         let scriptDelete = ""
 
