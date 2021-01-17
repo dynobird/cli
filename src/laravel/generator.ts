@@ -47,12 +47,14 @@ export class LaravelGenerator {
             let up = ''
             let fullForeignKeyScript = "";
             let fullIndexScript = "";
+            let fullDeleteScript = "";
+            const oldHistory = historyList[thisHistoryKey - 1];
             /**
              * Create table and change column
              */
             for await (const thisTableKey of Object.keys(thisHistory.design.table)) {
                 const thisTable: Table = thisHistory.design.table[thisTableKey]
-                if (thisHistoryKey === 0) {
+                if (oldHistory === undefined) {
                     console.log("for each 345345 MAKAN NGGAK MASUK")
                     up += await new Template().createTable(thisTable);
 
@@ -80,7 +82,6 @@ export class LaravelGenerator {
                     continue
                 }
                 console.log("MAKANNNNNNNN")
-                const oldHistory = historyList[thisHistoryKey - 1];
                 const oldTable: Table = oldHistory.design.table[thisTableKey]
 
                 if (oldTable === undefined) {
@@ -224,8 +225,23 @@ export class LaravelGenerator {
                 }
 
             }
+
+
+            if (oldHistory !== undefined) {
+                for await (const oldTableKey of Object.keys(oldHistory.design.table)) {
+                    const oldTable: Table = oldHistory.design.table[oldTableKey]
+                    const thisTable: Table = thisHistory.design.table[oldTableKey]
+
+                    if (thisTable === undefined) {
+                        fullDeleteScript += await new Template().dropForeignKeyByTable(oldHistory.design.table, oldTable)
+                        fullDeleteScript += await new Template().tableDelete(oldTable)
+                    }
+                }
+            }
+
             up += fullForeignKeyScript
             up += fullIndexScript;
+            up += fullDeleteScript;
 
             let migrationScript = await new Template().migrationTemplate(migrationClassName, up, '');
             await new FileMaker().makeMigration(config, migrationFileName, migrationScript);

@@ -7,6 +7,32 @@ export class Template {
         });\r\n`
     }
 
+    async dropForeignKeyByTable(oldTableLIst: any, deletedTable: Table) {
+        let scriptDelete = ""
+
+        for await (const oldTableKey of Object.keys(oldTableLIst)) {
+            let oldTable: Table = oldTableLIst[oldTableKey]
+            let scriptDeleteFkTable = ""
+            for await (const oldForeignKeyKey of Object.keys(oldTable.foreignKey)) {
+                let oldForeignKey: ForeignKey = oldTable.foreignKey[oldForeignKeyKey]
+
+                if (oldForeignKey.refTableId === deletedTable.id) {
+                    scriptDeleteFkTable += await this.foreignKeyDelete(oldForeignKey)
+                }
+            }
+
+            if (scriptDeleteFkTable !== "") {
+                scriptDelete += this.changeTableTemplate(oldTable.properties.name, scriptDeleteFkTable)
+            }
+        }
+
+        return scriptDelete
+    }
+
+    tableDelete(deletedTable: Table) {
+        return `Schema::dropIfExists('${deletedTable.properties.name}');`;
+    }
+
     changeTableTemplate(tableName: string, columnChangeScript: string) {
         return `Schema::table('${tableName}', function (Blueprint $table) {
             ${columnChangeScript}
