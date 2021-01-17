@@ -235,6 +235,21 @@ export class LaravelGenerator {
                     if (thisTable === undefined) {
                         fullDeleteScript += await new Template().dropForeignKeyByTable(oldHistory.design.table, oldTable)
                         fullDeleteScript += await new Template().tableDelete(oldTable)
+                        continue;
+                    }
+
+                    // delete index script
+                    let dropIndexScript = ""
+                    for await (const oldIndexKey of Object.keys(oldTable.index)) {
+                        let oldIndex: Index = oldTable.index[oldIndexKey]
+                        let thisIndex: Index = thisTable.index[oldIndexKey]
+                        if (thisIndex === undefined) {
+                            dropIndexScript += await new Template().indexDelete(oldIndex)
+                        }
+                    }
+
+                    if (dropIndexScript !== "") {
+                        fullDeleteScript += await new Template().changeTableTemplate(oldTable.properties.name, dropIndexScript)
                     }
                 }
             }
