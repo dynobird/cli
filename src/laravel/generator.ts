@@ -20,7 +20,7 @@ import fs from "fs"
 
 export class LaravelGenerator {
     async migration(config: GenerateConfig) {
-        console.log("DO migration for laravel")
+        // console.log("DO migration for laravel")
         let historyList: History[];
         try {
             let respond = await axios.get("https://app-testung.dynobird.com/api/v1/integration/access?keyword=%%&tokenId=c6013d42705038eace64673a9a19c641a5f3ced407dbc9623e33770128effec49d7f87f6775d21c8e48e6508368478fb13fb")
@@ -43,7 +43,7 @@ export class LaravelGenerator {
             let historyNameFormated = snakeCase(thisHistory.name)
             let migrationFileName = `${dateFormated}_${historyNameFormated}`
             let migrationClassName = pascalCase(thisHistory.name)
-            console.log(migrationFileName)
+            // console.log(migrationFileName)
             let up = ''
             let fullForeignKeyScript = "";
             let fullIndexScript = "";
@@ -55,7 +55,6 @@ export class LaravelGenerator {
             for await (const thisTableKey of Object.keys(thisHistory.design.table)) {
                 const thisTable: Table = thisHistory.design.table[thisTableKey]
                 if (oldHistory === undefined) {
-                    console.log("for each 345345 MAKAN NGGAK MASUK")
                     up += await new Template().createTable(thisTable);
 
                     //create new foreignKey
@@ -63,7 +62,7 @@ export class LaravelGenerator {
                     for await (const thisForeignKeyKey of Object.keys(thisTable.foreignKey)) {
                         const thisForeignKey = thisTable.foreignKey[thisForeignKeyKey]
                         foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
-                        console.log(foreignKeyScript)
+                        // console.log(foreignKeyScript)
                     }
                     if (foreignKeyScript !== "") {
                         fullForeignKeyScript += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
@@ -76,12 +75,10 @@ export class LaravelGenerator {
                         indexScript += await new Template().indexAdd(thisIndex, thisTable.column)
                     }
                     if (indexScript !== "") {
-                        console.log("CREATE NEW INDEX_____________________________________________________________________________  0")
                         up += await new Template().changeTableTemplate(thisTable.properties.name, indexScript)
                     }
                     continue
                 }
-                console.log("MAKANNNNNNNN")
                 const oldTable: Table = oldHistory.design.table[thisTableKey]
 
                 if (oldTable === undefined) {
@@ -92,7 +89,7 @@ export class LaravelGenerator {
                     for await (const thisForeignKeyKey of Object.keys(thisTable.foreignKey)) {
                         const thisForeignKey = thisTable.foreignKey[thisForeignKeyKey]
                         foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
-                        console.log(foreignKeyScript)
+                        // console.log(foreignKeyScript)
                     }
                     if (foreignKeyScript !== "") {
                         fullForeignKeyScript += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
@@ -105,7 +102,7 @@ export class LaravelGenerator {
                         indexScript += await new Template().indexAdd(thisIndex, thisTable.column)
                     }
                     if (indexScript !== "") {
-                        console.log("CREATE NEW INDEX_____________________________________________________________________________ ")
+                        // console.log("CREATE NEW INDEX_____________________________________________________________________________ ")
                         up += await new Template().changeTableTemplate(thisTable.properties.name, indexScript)
                     }
                     continue
@@ -152,7 +149,6 @@ export class LaravelGenerator {
                     const thisForeignKey: ForeignKey = thisTable.foreignKey[thisForeignKeyKey]
                     const oldForeignKey: ForeignKey = oldTable.foreignKey[thisForeignKeyKey]
                     if (oldForeignKey === undefined) {
-                        console.log("ADD foregin key from old 99999999999999999999999999999999999999999999999999999")
                         foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
                         continue;
                     }
@@ -164,7 +160,6 @@ export class LaravelGenerator {
                         (oldForeignKey.onDelete !== oldForeignKey.onDelete) ||
                         (oldForeignKey.onUpdate !== oldForeignKey.onUpdate)
                     ) {
-                        console.log("ADD foregin key changeee 888888888888888888888888888888888888888888888888888888888")
                         foreignKeyScript += await new Template().foreignKeyDelete(oldForeignKey)
                         foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
                     }

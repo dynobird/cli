@@ -43,5 +43,5 @@ if (command === 'generate:migration') {
     }
     new Generator().migration(dynoConfig)
 }
-console.log(process.argv);
-console.log(process.cwd())
+// console.log(process.argv);
+// console.log(process.cwd())

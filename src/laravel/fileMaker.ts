@@ -7,8 +7,8 @@ export class FileMaker {
         let thisDirectory = process.cwd()
         // fs.writeFileSync(`${thisDirectory}/${migrationFileName}.php`, migrationScript);
         let filePath = `${thisDirectory}/${config.migrationsDir}/${fileName}.php`
-        console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-        console.log(filePath)
+        // console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+        // console.log(filePath)
         fs.writeFileSync(filePath, data)
     }
 }

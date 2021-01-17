@@ -104,12 +104,12 @@ export class Template {
 
     changeColumn(thisColumn: Column) {
         let columnScript = ""
-        console.log("MASUKK columnnnn " + thisColumn.dataType)
+        // console.log("MASUKK columnnnn " + thisColumn.dataType)
         let tmp = thisColumn.dataType.split('(')
         let length = 0
         let cleanColumnType = tmp[0]
         if (tmp[1]) {
-            console.log("no have lenth")
+            // console.log("no have lenth")
             length = parseInt(tmp[1].replace(")", "").trim())
         }
         if (length === 0) {
@@ -145,12 +145,12 @@ export class Template {
 
     addColumn(thisColumn: Column) {
         let columnScript = ""
-        console.log("MASUKK columnnnn " + thisColumn.dataType)
+        // console.log("MASUKK columnnnn " + thisColumn.dataType)
         let tmp = thisColumn.dataType.split('(')
         let length = 0
         let cleanColumnType = tmp[0]
         if (tmp[1]) {
-            console.log("no have lenth")
+            // console.log("no have lenth")
             length = parseInt(tmp[1].replace(")", "").trim())
         }
         if (length === 0) {
@@ -197,7 +197,7 @@ export class Template {
     async createTable(table: Table) {
         let tableName = table.properties.name;
         let columnScript = ""
-        console.log("MASUKK")
+        // console.log("MASUKK")
 
         for await (const thisColumnKey of Object.keys(table.column)) {
             let thisColumn: Column = table.column[thisColumnKey]
