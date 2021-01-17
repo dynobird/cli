@@ -268,6 +268,29 @@ export class LaravelGenerator {
                     if (dropColumnScript !== "") {
                         fullDeleteScript += await new Template().changeTableTemplate(oldTable.properties.name, dropColumnScript)
                     }
+
+
+                    // delete foreign key
+                    let dropForeignKeyScript = "";
+                    for await (const oldForeignKeyKey of Object.keys(oldTable.foreignKey)) {
+                        let oldForeignKey: ForeignKey = oldTable.foreignKey[oldForeignKeyKey]
+                        // check if depedency to column and table deleted it must handle delete in parent check
+                        let refTable: Table = thisHistory.design.table[oldForeignKey.refTableId]
+                        if ((refTable === undefined) ||
+                            (refTable.column[oldForeignKey.refColumnIds[0]] === undefined) ||
+                            (thisTable.column[oldForeignKey.columnIds[0]]) === undefined) {
+                            continue
+                        }
+
+
+                        if (thisTable.foreignKey[oldForeignKeyKey] === undefined) {
+                            dropForeignKeyScript += await new Template().foreignKeyDelete(oldForeignKey)
+                        }
+                    }
+
+                    if (dropForeignKeyScript !== "") {
+                        fullDeleteScript += await new Template().changeTableTemplate(oldTable.properties.name, dropForeignKeyScript)
+                    }
                 }
             }
 
