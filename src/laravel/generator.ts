@@ -142,17 +142,16 @@ export class LaravelGenerator {
                         (oldForeignKey.onUpdate !== oldForeignKey.onUpdate)
                     ) {
                         console.log("ADD foregin key changeee 888888888888888888888888888888888888888888888888888888888")
-                        foreignKeyScript += await new Template().foreignKeyDelete(thisForeignKey)
+                        foreignKeyScript += await new Template().foreignKeyDelete(oldForeignKey)
                         foreignKeyScript += await new Template().foreignKeyAdd(thisForeignKey, thisTable, thisHistory.design.table)
                     }
                 }
 
                 if (foreignKeyScript !== "") {
-                    up += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
+                    fullForeignKeyScript += await new Template().changeTableTemplate(thisTable.properties.name, foreignKeyScript)
                 }
-
             }
-
+            up += fullForeignKeyScript
 
             let migrationScript = await new Template().migrationTemplate(migrationClassName, up, '');
             // await new FileMaker().makeMigration(config, migrationFileName, migrationScript);
