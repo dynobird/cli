@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/index.js",
   "bin": {
-    "dyno": "./dist/index.js"
+    "dynobird": "./dist/index.js"
   },
   "scripts": {
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
