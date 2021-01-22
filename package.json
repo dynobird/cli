@@ -12,6 +12,7 @@
     "build": "tsc -p .",
     "local": "npm i -g && dyno",
     "try": "tsc -p . && npm i -g && dyno generate:migration",
+    "i-local": "tsc -p . && npm i -g",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
   },
   "author": "",

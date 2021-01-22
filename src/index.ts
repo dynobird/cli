@@ -43,5 +43,8 @@ if (command === 'generate:migration') {
     }
     new Generator().migration(dynoConfig)
 }
+else if( command === 'import'){
+    
+}
 // console.log(process.argv);
 // console.log(process.cwd())

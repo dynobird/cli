@@ -23,8 +23,9 @@ export class LaravelGenerator {
         // console.log("DO migration for laravel")
         let historyList: History[];
         try {
-            let respond = await axios.get("https://app-testung.dynobird.com/api/v1/integration/access?keyword=%%&tokenId=c6013d42705038eace64673a9a19c641a5f3ced407dbc9623e33770128effec49d7f87f6775d21c8e48e6508368478fb13fb")
+            let respond = await axios.get(`https://app.dynobird.com/api/v1/integration/access?tag=${config.tag}&token=${config.token}`)
             if (respond.data.success === false) {
+                console.log(JSON.stringify(respond.data.message))
                 console.error("Error : " + respond.data.message)
                 process.exit(1)
             }
@@ -48,6 +49,7 @@ export class LaravelGenerator {
             let fullForeignKeyScript = "";
             let fullIndexScript = "";
             let fullDeleteScript = "";
+            let fullPrimaryScript = "";
             const oldHistory = historyList[thisHistoryKey - 1];
             /**
              * Create table and change column
@@ -143,6 +145,96 @@ export class LaravelGenerator {
                 }
 
 
+
+                /**
+                * ------------ start primary column manipulation
+                */
+
+
+                let thisPrimaryColumnNameList: string[] = []
+                let oldPrimaryColumnNameList: string[] = []
+                // Get all this primary column name
+                for await (const thisColumnKey of Object.keys(thisTable.column)) {
+                    // console.log("1 pppppp");
+                    const thisColumn: Column = thisTable.column[thisColumnKey]
+                    if (thisColumn.primary === true) {
+                        thisPrimaryColumnNameList.push(thisColumn.name)
+                    }
+                }
+                // short ascending
+                thisPrimaryColumnNameList.sort()
+
+
+                // Get all old primary column name
+                for await (const oldColumnKey of Object.keys(oldTable.column)) {
+                    // console.log("2 pppppp");
+                    const oldColumn: Column = oldTable.column[oldColumnKey]
+                    if (oldColumn.primary === true) {
+                        oldPrimaryColumnNameList.push(oldColumn.name)
+                    }
+                }
+                oldPrimaryColumnNameList.sort()
+
+                // console.log(oldPrimaryColumnNameList);
+                // console.log(thisPrimaryColumnNameList);
+
+                let isDifferent = false;
+                // compare change and additional
+                for (let i = 0; i < thisPrimaryColumnNameList.length; i++) {
+                    // console.log("3 pppppp");
+                    // if there are additional primary key
+                    if (oldPrimaryColumnNameList[i] === undefined) {
+                        isDifferent = true
+                        break;
+                    }
+
+                    // if there are changed primary key
+                    if (thisPrimaryColumnNameList[i] !== oldPrimaryColumnNameList[i]) {
+                        isDifferent = true
+                        break;
+                    }
+                }
+
+                for (let i = 0; i < oldPrimaryColumnNameList.length; i++) {
+                    // console.log("4 pppppp");
+                    // if there are deleted primary column
+                    if (thisPrimaryColumnNameList[i] === undefined) {
+                        isDifferent = true
+                        break;
+                    }
+
+                    // if there are changed primary key
+                    if (oldPrimaryColumnNameList[i] !== thisPrimaryColumnNameList[i]) {
+                        isDifferent = true
+                        break;
+                    }
+                }
+
+                if (isDifferent === true) {
+                    let dropPrimaryKeyScript = await new Template().dropPrimary(thisTable)
+                    let primaryChangeScript = "";
+                    for await (const thisColumnKey of Object.keys(thisTable.column)) {
+                        let thisColumn: Column = thisTable.column[thisColumnKey]
+
+                        if (thisColumn.primary === true && thisColumn.dataType !== 'id') {
+                            primaryChangeScript += `'${thisColumn.name}', `
+                        }
+                    }
+
+                    if (primaryChangeScript !== "") {
+                        primaryChangeScript = primaryChangeScript.substring(0, primaryChangeScript.length - 2)
+                        primaryChangeScript = `$table->primary([${primaryChangeScript}]);\r\n`
+                    }
+
+                    primaryChangeScript = dropPrimaryKeyScript + primaryChangeScript
+                    fullPrimaryScript += await new Template().changeTableTemplate(thisTable.properties.name, primaryChangeScript)
+
+                }
+
+
+                /**
+                 * ------------ end primary column manipulation
+                 */
 
                 let foreignKeyScript = ""
                 for await (const thisForeignKeyKey of Object.keys(thisTable.foreignKey)) {
@@ -292,6 +384,7 @@ export class LaravelGenerator {
             up += fullForeignKeyScript
             up += fullIndexScript;
             up += fullDeleteScript;
+            up += fullPrimaryScript;
 
             let migrationScript = await new Template().migrationTemplate(migrationClassName, up, '');
             await new FileMaker().makeMigration(config, migrationFileName, migrationScript);

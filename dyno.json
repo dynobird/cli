@@ -3,6 +3,6 @@
     "migrationsDir": "migration",
     "framework": "laravel",
     "version": "8",
-    "token": "c6013d42705038eace64673a9a19c641a5f3ced407dbc9623e33770128effec49d7f87f6775d21c8e48e6508368478fb13fb",
-    "tag": "*"
+    "token": "87969e84486f3eeaf225f7ae0421db5cc6323ba04b3e174814ade0f0cd0db73e6d3bd3881da7583dbbd85a1c47c15aa2d21d",
+    "tag": "%%"
 }

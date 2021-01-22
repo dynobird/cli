@@ -10,6 +10,12 @@ export class Template {
     async columnDelete(column: Column) {
         return `$table->dropColumn('${column.name}');\r\n`;
     }
+
+    dropPrimary(table: Table) {
+        return `$table->dropPrimary('${table.properties.name}');\r\n`
+    }
+
+
     async dropForeignKeyByColumn(oldTableList: any, deletedColumn: Column) {
         let scriptDelete = ""
         for await (const oldTableKey of Object.keys(oldTableList)) {
@@ -216,7 +222,7 @@ export class Template {
 
         if (primaryColumn !== "") {
             primaryColumn = primaryColumn.substring(0, primaryColumn.length - 2)
-            columnScript += `table->primary([${primaryColumn}]);\r\n             `
+            columnScript += `$table->primary([${primaryColumn}]);\r\n             `
         }
 
         return this.makeTableTemplate(tableName, columnScript)
