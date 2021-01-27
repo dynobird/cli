@@ -6,9 +6,9 @@ import { GenerateConfig } from "./lib/type";
 import chalk from "chalk";
 program
     .version('0.0.1')
-    .description("An example CLI for ordering pizza's")
-    .option('export migration:latest', 'get latest design migration un tag')
-    .option('import migration', 'Add pineapple')
+    .description("dynobird cli")
+    .option('migration:generate', 'generate migration based on tag of your history')
+    .option('init', 'For initital dynobird.json configuration project')
     .parse(process.argv);
 
 if (!process.argv.slice(2).length) {
@@ -77,6 +77,8 @@ else if (command === 'init') {
     new Generator().dynobirdJSON(dynoJsonPath)
     
 
+}else{
+    console.log(chalk.red(" Command not found "))
 }
 // console.log(process.argv);
 // console.log(process.cwd())
