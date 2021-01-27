@@ -25,7 +25,7 @@ export class LaravelGenerator {
         let historyList: History[];
         console.log(chalk.yellow(" Fetching data...."))
         try {
-            var respond = await axios.get(`https://app.dynobird.com/api/v1/integration/access?tag=${config.tag}&token=${config.token}`)
+            var respond = await axios.get(`https://us.dynobird.com/api/v1/integration/access?tag=${config.tag}&token=${config.token}`)
             if (respond.data.success === false) {
                 console.log(chalk.red(" Error : " + respond.data.message))
                 process.exit(1)
