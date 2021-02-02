@@ -1,18 +1,18 @@
 # Intorduction [beta-0.0.1]
-Dynobird is database designer for web developer. So every line of code always think to make web developer easy in work. CLI tools is one of developer needs. We provide it with full support for community.
+Dynobird.com is database designer for web developer. So every line of code always think to make web developer easy in work. CLI tools is one of developer needs. We provide it with full support for community.
 # Install
-Dynobird cli must install under nodeJS and npm. If you dont have npm and nodeJS follow this tutorial https://nodejs.org/en/download/
+[dynobird](https://dynobird.com) cli must install under nodeJS and npm. If you dont have npm and nodeJS follow this tutorial https://nodejs.org/en/download/
 
-dynobird recommend to use nodeJS version 14.04
+[dynobird](https://dynobird.com) recommend to use nodeJS version 14.04
 
 ```shell
 npm i -g dynobird
 ```
 # Using
-dynobird CLI is build on top of nodeJS. NodeJS required to install in Operating system. 
-dynobird CLI required token to access your project. Follow this picture for copy your project token.
+[dynobird](https://dynobird.com) CLI is build on top of nodeJS. NodeJS required to install in Operating system. 
+[dynobird](https://dynobird.com) CLI required token to access your project. Follow this picture for copy your project token.
 
-![token image](docs/img/token.png "Dynobird token")
+![token image](./docs/img/token.png "Dynobird token")
 
 ## dynobird.json
 this is configuration for project information and token for generating migration. This file can generate with command ```dynobird init```
@@ -27,8 +27,8 @@ this is configuration for project information and token for generating migration
 
 ## init
 ```$ dynobird init``` is command for initial dynobird.json if empty in project.
-![token image](docs/img/dynobird-init.png "Dynobird init project")
+![token image](./docs/img/dynobird-init.png "Dynobird init project")
 ## migration
 ```$ dynobird migration:generate``` is command for generate database design to database migration.
 
-![token image](docs/img/dynobird-generate-migration.png "Dynobird init project")
+![token image](./docs/img/dynobird-generate-migration.png "Dynobird init project")
