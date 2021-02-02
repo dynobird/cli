@@ -52,16 +52,7 @@ if (command === 'migration:generate') {
         console.log(chalk.red(" Key tag not found"))
         process.exit(1)
     }
-
-    if (!dynoConfig.framework) {
-        console.log(chalk.red(" Key framework not found"))
-        process.exit(1)
-    }
     
-    if (!dynoConfig.frameworkVersion) {
-        console.log(chalk.red(" Key frameworkVersion not found"))
-        process.exit(1)
-    }
     new Generator().migration(dynoConfig)
 }
 else if (command === 'import') {

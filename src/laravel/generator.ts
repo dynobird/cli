@@ -39,10 +39,12 @@ export class LaravelGenerator {
         let projectProperties=respond.data.payload.properties
         console.log(chalk.green(" Fetching finish 🎉"))
         console.log(chalk.grey('-----------------------------------------'))
-        console.log(chalk.green(` Project  name  : `)+projectProperties.name)
-        console.log(chalk.green(` Database type  : `)+projectProperties.databaseType)
-        console.log(chalk.green(` Schema version : `)+projectProperties.schemaVersion)
-        console.log(chalk.green(` Total history  : `)+respond.data.payload.total)
+        console.log(chalk.green(` Project  name     : `) + respond.data.payload.properties.name)
+        console.log(chalk.green(` Database type     : `) + respond.data.payload.properties.databaseType)
+        console.log(chalk.green(` Schema version    : `) + respond.data.payload.properties.schemaVersion)
+        console.log(chalk.green(` Framework target  : `) + respond.data.payload.properties.frameworkType)
+        console.log(chalk.green(` Framweork version : `) + respond.data.payload.properties.frameworkVersion)
+        console.log(chalk.green(` Total history     : `) + respond.data.payload.total)
         console.log(chalk.grey('-----------------------------------------'))
 
         let thisHistoryKey = -1
