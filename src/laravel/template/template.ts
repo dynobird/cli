@@ -148,13 +148,61 @@ export class Template {
         columnScript += "->change();\r\n";
         return columnScript;
     }
+    columnMapping(columnTypeDynoBird: string) {
+        let mappingList: any = {
+            bigInteger: ["BIGINT"],
+            binary: ["BLOB"],
+            boolean: ["BOOLEAN"],
+            char: ["CHAR"],
+            dateTimeTz: ["DATETIME"],
+            dateTime: ["DATETIME"],
+            date: ["DATE"],
+            decimal: ["DECIMAL"],
+            double: ["DOUBLE"],
+            enum: ["ENUM"],
+            float: ["FLOAT"],
+            geometryCollection: ["GEOMETRYCOLLECTION"],
+            geometry: ["GEOMETRY"],
+            integer: ["INTEGER", "INT"],
+            json: ["JSON"],
+            jsonb: ["JSONB"],
+            lineString: ["LINESTRING"],
+            longText: ["LONGTEXT"],
+            mediumInteger: ["MEDIUMINT"],
+            mediumText: ["MEDIUMTEXT"],
+            multiLineString: ["MULTILINESTRING"],
+            multiPoint: ["MULTIPOINT"],
+            multiPolygon: ["MULTIPOLYGON"],
+            point: ["POINT"],
+            polygon: ["POLYGON"],
+            smallInteger: ["SMALLINT"],
+            string: ["VARCHAR"],
+            text: ["TEXT"],
+            timeTz: ["TIME"],
+            time: ["TIME"],
+            timestampTz: ["TIMESTAMP"],
+            timestamps: ["TIMESTAMP"],
+            tinyInteger: ["TINYINT"],
+            uuid: ["UUID"],
+            year: ["YEAR"],
+        }
+
+        for (const mappingKey of Object.keys(mappingList)) {
+            let mapping = mappingList[mappingKey]
+            if (mapping.indexOf(columnTypeDynoBird) >= 0) {
+                return mappingKey
+            }
+        }
+
+        throw new Error("Data type |" + columnTypeDynoBird + "| not found in cli mapping laravel data type")
+    }
 
     addColumn(thisColumn: Column) {
         let columnScript = ""
         // console.log("MASUKK columnnnn " + thisColumn.dataType)
         let tmp = thisColumn.dataType.split('(')
         let length = 0
-        let cleanColumnType = tmp[0]
+        let cleanColumnType = this.columnMapping(tmp[0])
         if (tmp[1]) {
             // console.log("no have lenth")
             length = parseInt(tmp[1].replace(")", "").trim())
@@ -162,7 +210,18 @@ export class Template {
         if (length === 0) {
             columnScript += `$table->${cleanColumnType}('${thisColumn.name}')`
         } else {
-            columnScript += `$table->${cleanColumnType}('${thisColumn.name}', ${length})`
+            switch (cleanColumnType) {
+                case 'bigInteger':
+                case 'integer':
+                case 'mediumInteger':
+                case 'tinyInteger':
+                    columnScript += `$table->${cleanColumnType}('${thisColumn.name}')`
+                    break;
+                default:
+                    columnScript += `$table->${cleanColumnType}('${thisColumn.name}', ${length})`
+                    break;
+            }
+
         }
         if (thisColumn.unique === true) {
             columnScript += '->unique()';

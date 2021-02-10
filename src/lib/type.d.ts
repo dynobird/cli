@@ -1,6 +1,8 @@
 export interface GenerateConfig {
     tag: string
+    frameworkVersion: string
     token: string
+    framework: string
     migrationsDir: string
     entitiesDir: string
 }
