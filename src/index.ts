@@ -4,10 +4,12 @@ import { Generator } from "./generator";
 import fs from "fs"
 import { GenerateConfig } from "./lib/type";
 import chalk from "chalk";
+import { Import } from './import'
 program
     .version('0.0.1')
     .description("dynobird cli")
     .option('migration:generate', 'generate migration based on tag of your history')
+    .option('import', 'import database to design')
     .option('init', 'For initital dynobird.json configuration project')
     .parse(process.argv);
 
@@ -52,11 +54,11 @@ if (command === 'migration:generate') {
         console.log(chalk.red(" Key tag not found"))
         process.exit(1)
     }
-    
+
     new Generator().migration(dynoConfig)
 }
 else if (command === 'import') {
-
+    new Import().main()
 }
 else if (command === 'init') {
     let thisDir = process.cwd()
@@ -66,9 +68,9 @@ else if (command === 'init') {
         process.exit(1)
     }
     new Generator().dynobirdJSON(dynoJsonPath)
-    
 
-}else{
+
+} else {
     console.log(chalk.red(" Command not found "))
 }
 // console.log(process.argv);
