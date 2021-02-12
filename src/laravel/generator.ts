@@ -17,7 +17,7 @@ import {
 } from "change-case";
 import moment from "moment"
 import fs from "fs"
-import chalk  from "chalk"
+import chalk from "chalk"
 
 export class LaravelGenerator {
     async migration(config: GenerateConfig) {
@@ -25,7 +25,12 @@ export class LaravelGenerator {
         let historyList: History[];
         console.log(chalk.yellow(" Fetching data...."))
         try {
-            var respond = await axios.get(`https://us.dynobird.com/api/v1/integration/access?tag=${config.tag}&token=${config.token}`)
+            let page = 0
+            let limit = 1
+            if (config.tag != '--latest') {
+                limit = 30
+            }
+            var respond = await axios.get(`http://localhost:8081/api/v1/integration/access?tag=${config.tag}&token=${config.token}&page=${page}&limit=${limit}`)
             if (respond.data.success === false) {
                 console.log(chalk.red(" Error : " + respond.data.message))
                 process.exit(1)
@@ -36,14 +41,12 @@ export class LaravelGenerator {
             process.exit(1)
         }
 
-        let projectProperties=respond.data.payload.properties
+        let projectProperties = respond.data.payload.properties
         console.log(chalk.green(" Fetching finish 🎉"))
         console.log(chalk.grey('-----------------------------------------'))
         console.log(chalk.green(` Project  name     : `) + respond.data.payload.properties.name)
         console.log(chalk.green(` Database type     : `) + respond.data.payload.properties.databaseType)
         console.log(chalk.green(` Schema version    : `) + respond.data.payload.properties.schemaVersion)
-        console.log(chalk.green(` Framework target  : `) + respond.data.payload.properties.frameworkType)
-        console.log(chalk.green(` Framweork version : `) + respond.data.payload.properties.frameworkVersion)
         console.log(chalk.green(` Total history     : `) + respond.data.payload.total)
         console.log(chalk.grey('-----------------------------------------'))
 
@@ -61,7 +64,7 @@ export class LaravelGenerator {
             let fullDeleteScript = "";
             let fullPrimaryScript = "";
             const oldHistory = historyList[thisHistoryKey - 1];
-            console.log(chalk.yellow(" Generating : "+historyNameFormated))
+            console.log(chalk.yellow(" Generating : " + historyNameFormated))
             /**
              * Create table and change column
              */
@@ -399,7 +402,7 @@ export class LaravelGenerator {
 
             let migrationScript = await new Template().migrationTemplate(migrationClassName, up, '');
             await new FileMaker().makeMigration(config, migrationFileName, migrationScript);
-        }        
+        }
         console.log(chalk.bgGreen(chalk.black(" Status     : Generate migration completed ✔  ")))
     }
 }
