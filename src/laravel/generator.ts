@@ -20,6 +20,73 @@ import fs from "fs"
 import chalk from "chalk"
 
 export class LaravelGenerator {
+    fakeName = [
+        "Abiu",
+        "Acerola",
+        "Ackee",
+        "Apple",
+        "Apricot",
+        "Avocado",
+        "Banana",
+        "Bilberry",
+        "Blackberry",
+        "Blackcurrant",
+        "Black sapote",
+        "Blueberry",
+        "Boysenberry",
+        "Breadfruit",
+        "Cempedak",
+        "Currant",
+        "Cherry",
+        "Cloudberry",
+        "Coconut",
+        "Cranberry",
+        "Damson",
+        "Date",
+        "Durian",
+        "Elderberry",
+        "Feijoa",
+        "Fig",
+        "Gooseberry",
+        "Grape",
+        "Raisin",
+        "Grapefruit",
+        "Guava",
+        "Honeyberry",
+        "Huckleberry",
+        "Jabuticaba",
+        "Jackfruit",
+        "Jambul",
+        "Jostaberry",
+        "Jujube",
+        "Kiwifruit",
+        "Kumquat",
+        "Lemon",
+        "Lime",
+        "Loganberry",
+        "Loquat",
+        "Longan",
+        "Lulo",
+        "Lychee",
+        "Mango",
+        "Mangosteen",
+        "Marionberry",
+        "Melon",
+        "Cantaloupe",
+        "Honeydew",
+        "Watermelon",
+        "Mulberry",
+        "Nance",
+        "Nectarine",
+        "Orange",
+        "Clementine",
+        "Mandarine",
+        "Tangerine",
+        "Papaya",
+    ]
+    getRandomeFakeName(number: number) {
+        return this.fakeName[number] + 'no_name'
+    }
     async migration(config: GenerateConfig) {
         // console.log("DO migration for laravel")
         let historyList: History[];
@@ -52,6 +119,9 @@ export class LaravelGenerator {
 
         let thisHistoryKey = -1
         for await (const thisHistory of historyList) {
+            if (!thisHistory.name || thisHistory.name.trim() == '') {
+                thisHistory.name = this.getRandomeFakeName(moment(thisHistory.createdAt).get('second'))
+            }
             thisHistoryKey++;
             let dateFormated = moment(thisHistory.createdAt).format("YYYY_MM_DD_HHmmss")
             let historyNameFormated = snakeCase(thisHistory.name)
