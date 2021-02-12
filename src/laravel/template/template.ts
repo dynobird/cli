@@ -148,13 +148,15 @@ export class Template {
         columnScript += "->change();\r\n";
         return columnScript;
     }
+
     columnMapping(columnTypeDynoBird: string) {
         let mappingList: any = {
+            set: ["SET"],
             bigInteger: ["BIGINT"],
-            binary: ["BLOB"],
-            boolean: ["BOOLEAN"],
+            binary: ["BLOB", "BINARY", "VARBINARY", 'TINYBLOB', 'MEDIUMBLOB', 'LONGBLOB'],
+            boolean: ["BOOLEAN", 'BIT'],
             char: ["CHAR"],
-            dateTimeTz: ["DATETIME"],
+            // dateTimeTz: ["DATETIME"],
             dateTime: ["DATETIME"],
             date: ["DATE"],
             decimal: ["DECIMAL"],
@@ -177,10 +179,10 @@ export class Template {
             polygon: ["POLYGON"],
             smallInteger: ["SMALLINT"],
             string: ["VARCHAR"],
-            text: ["TEXT"],
-            timeTz: ["TIME"],
+            text: ["TEXT", "TINYTEXT"],
+            // timeTz: ["TIME"],
             time: ["TIME"],
-            timestampTz: ["TIMESTAMP"],
+            // timestampTz: ["TIMESTAMP"],
             timestamps: ["TIMESTAMP"],
             tinyInteger: ["TINYINT"],
             uuid: ["UUID"],
