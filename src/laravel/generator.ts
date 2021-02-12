@@ -85,7 +85,7 @@ export class LaravelGenerator {
         "Papaya",
     ]
     getRandomeFakeName(number: number) {
-        return this.fakeName[number] + 'no_name'
+        return this.fakeName[number] + '_no_name'
     }
     async migration(config: GenerateConfig) {
         // console.log("DO migration for laravel")
