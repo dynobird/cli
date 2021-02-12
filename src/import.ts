@@ -179,7 +179,7 @@ export class Import {
     }
 
     async push(sql: string, token: string) {
-        let response = await axios.post(`https://us.dynobird.com/api/v1/integration/importSql`, {
+        let response = await axios.post(`http://localhost:8081/api/v1/integration/importSql`, {
             token: token,
             sql: btoa(sql)
         })

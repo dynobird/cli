@@ -16,8 +16,13 @@ export class Generator {
         }
     }
     async dynobirdJSON(dynoJsonPath: string) {
-
-
+        console.log()
+        console.log()
+        console.log(chalk.grey('-----------------------------------------'))
+        console.log(chalk.green(`     Dynobird init project 🎉🎉🎉 `))
+        console.log(chalk.grey('-----------------------------------------'))
+        console.log()
+        
         const tokenResponse = await prompts({
             type: 'text',
             name: 'token',
@@ -27,12 +32,13 @@ export class Generator {
         const tagResponse = await prompts({
             type: 'text',
             name: 'tag',
-            message: 'What is your main tag ?'
+            message: 'What is your main tag ?',
+            initial: '--latest'
         });
 
         const spinner = ora(' Validating project',).start()
         spinner.color = 'yellow'
-        var respond = await axios.get(`https://us.dynobird.com/api/v1/integration/access?tag=${tagResponse.tag}&token=${tokenResponse.token}`)
+        var respond = await axios.get(`http://localhost:8081/api/v1/integration/access?tag=${tagResponse.tag}&token=${tokenResponse.token}`)
         if (respond.data.success === false) {
             console.log(chalk.red(" Error : " + respond.data.message))
             process.exit(1)
