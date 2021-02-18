@@ -49,11 +49,6 @@ async function main() {
             process.exit(1)
         }
 
-        if (!dynoConfig.tag) {
-            console.log(chalk.red(" Key tag not found"))
-            process.exit(1)
-        }
-
         new Generator().migration(dynoConfig)
     }
     else if (command === 'import') {

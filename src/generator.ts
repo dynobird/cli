@@ -22,23 +22,17 @@ export class Generator {
         console.log(chalk.green(`     Dynobird init project 🎉🎉🎉 `))
         console.log(chalk.grey('-----------------------------------------'))
         console.log()
-        
+
         const tokenResponse = await prompts({
             type: 'text',
             name: 'token',
             message: 'What is your project token ?'
         });
 
-        const tagResponse = await prompts({
-            type: 'text',
-            name: 'tag',
-            message: 'What is your main tag ?',
-            initial: '--latest'
-        });
 
         const spinner = ora(' Validating project',).start()
         spinner.color = 'yellow'
-        var respond = await axios.get(`http://localhost:8081/api/v1/integration/access?tag=${tagResponse.tag}&token=${tokenResponse.token}`)
+        var respond = await axios.get(`https://us.dynobird.com/api/v1/integration/access?tag=--latest&token=${tokenResponse.token}`)
         if (respond.data.success === false) {
             console.log(chalk.red(" Error : " + respond.data.message))
             process.exit(1)
@@ -66,7 +60,7 @@ export class Generator {
                 // { title: 'type orm', value: 'type_orm', disabled: true },
                 // { title: 'squelize', value: 'squelize', disabled: true },
             ],
-            initial: 1,
+            initial: 0,
             message: 'What is your target framework ?'
         });
 
@@ -78,7 +72,7 @@ export class Generator {
                 { title: '8', value: '8', disabled: false },
                 { title: '7', value: '7', disabled: true },
             ],
-            initial: 1,
+            initial: 0,
             message: 'What is your framework version ?'
         });
 
@@ -109,8 +103,7 @@ export class Generator {
             migrationsDir: migrationDir.migrationDir,
             framework: framework.framework,
             frameworkVersion: frameworkVersion.version,
-            token: tokenResponse.token,
-            tag: tagResponse.tag
+            token: tokenResponse.token
         }
 
         fs.writeFileSync(dynoJsonPath, jsonFormat(dynobirdJSON))
