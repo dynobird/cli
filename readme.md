@@ -3,7 +3,7 @@ Dynobird.com is database designer for web developer. So every line of code alway
 
 youtube :
 
-[![dynobird.com demo video](https://img.youtube.com/vi/wtq0_OuL7cM/0.jpg)](https://www.youtube.com/watch?v=wtq0_OuL7cM)
+[![dynobird.com demo video](https://github.com/dynobird/cli/raw/master/docs/img/history.png)](https://www.youtube.com/watch?v=wtq0_OuL7cM)
 
 # Install
 [dynobird](https://dynobird.com) cli must install under nodeJS and npm. If you don't have npm and nodeJS follow this tutorial https://nodejs.org/en/download/
