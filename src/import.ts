@@ -148,46 +148,64 @@ export class Import {
     }
 
     async getToken() {
-        let thisDir = process.cwd()
-        let dynoJsonPath = `${thisDir}/dynobird.json`
-        if (!fs.existsSync(dynoJsonPath)) {
-            const token = await prompts({
-                type: 'text',
-                name: 'value',
-                message: 'Token project :',
-                initial: '',
-            });
-            return token.value
-        }
-
-        let raw = fs.readFileSync(dynoJsonPath);
-        let dynoConfig: GenerateConfig
-
-        try {
-            dynoConfig = JSON.parse(raw.toString())
-        } catch (error) {
-            console.log(chalk.red(" Invalid dynobird.json"))
-            process.exit(1)
-        }
-
-        if (!dynoConfig.token) {
-            console.log(chalk.red(" Key token not found"))
-            process.exit(1)
-        }
-
-        return dynoConfig.token
+        const token = await prompts({
+            type: 'text',
+            name: 'value',
+            message: 'Token project :',
+            initial: '',
+        });
+        return token.value
     }
 
     async push(sql: string, token: string) {
-        let response = await axios.post(`http://localhost:8081/api/v1/integration/importSql`, {
+        let response = await axios.post(`https://us.dynobird.com/api/v1/integration/importSql`, {
             token: token,
             sql: btoa(sql)
         })
         return response.data
     }
+
+    async validating(token: string) {
+        console.log(chalk.yellow(" Validating token...."))
+        try {
+            let page = 0
+            let limit = 1
+            var respond = await axios.get(`https://us.dynobird.com/api/v1/integration/access?tag=--latest&token=${token}&page=${page}&limit=${limit}`)
+            if (respond.data.success === false) {
+                console.log(chalk.red(" Error : " + respond.data.message))
+                process.exit(1)
+            }
+        } catch (error) {
+            console.log(chalk.red(" Error : " + error.message))
+            process.exit(1)
+        }
+
+        console.log(chalk.green(" Validating finish 🎉"))
+        console.log(chalk.grey('-----------------------------------------'))
+        console.log(chalk.green(` Project  name     : `) + respond.data.payload.properties.name)
+        console.log(chalk.green(` Database type     : `) + respond.data.payload.properties.databaseType)
+        console.log(chalk.green(` Schema version    : `) + respond.data.payload.properties.schemaVersion)
+        console.log(chalk.green(` Total history     : `) + respond.data.payload.total)
+        console.log(chalk.grey('-----------------------------------------'))
+
+        const isContinue = await prompts({
+            type: 'confirm',
+            name: 'value',
+            message: 'Do you want to import to this project ?',
+            initial: '',
+        });
+
+        if (isContinue.value == false) {
+            process.exit(1)
+        }
+
+    }
     async main() {
-        let answer = await this.question()        
+        let answer = await this.question()
         let token = await this.getToken()
+
+        await this.validating(token)
+
         console.log(chalk.yellow(" Dumping SQL create...."))
         let sqlCreate = await this.getSqlCreateMysql(answer)
         try {

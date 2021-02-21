@@ -2,6 +2,7 @@ import { Column, ForeignKey, GenerateConfig, History, Index, Table } from "../li
 import { Template } from "./template/template"
 import axios from "axios"
 import { FileMaker } from "./fileMaker"
+import prompts from "prompts"
 import {
     camelCase,
     capitalCase,
@@ -85,8 +86,64 @@ export class LaravelGenerator {
         "Papaya",
     ]
     getRandomeFakeName(number: number) {
-        return this.fakeName[number] + '_no_name'
+        return this.fakeName[number]
     }
+
+    async getOldTable(oldHistory: History, tableName: string) {
+
+        if (!oldHistory) {
+            return undefined
+        }
+
+        for await (const tableId of Object.keys(oldHistory.design.table)) {
+            let table = oldHistory.design.table[tableId]
+            if (table.name === tableName) {
+                return table
+            }
+        }
+
+        return undefined
+    }
+
+    async getOldColumn(oldHistory: History, tableName: string, columnName: string) {
+
+        if (!oldHistory) {
+            return undefined
+        }
+
+        for await (const tableKey of Object.keys(oldHistory.design.table)) {
+            let table: Table = oldHistory.design.table[tableKey]
+            if (table.properties.name === tableName) {
+                for await (const columnKey of Object.keys(table.column)) {
+                    let column: Column = table.column[columnKey]
+                    if (columnName === column.name) {
+                        return column
+                    }
+                }
+            }
+        }
+        return undefined
+    }
+
+    async getOldIndex(oldHistory: History, tableName: string, indexName: string) {
+        if (!oldHistory) {
+            return undefined
+        }
+
+        for await (const tableKey of Object.keys(oldHistory.design.table)) {
+            let table: Table = oldHistory.design.table[tableKey]
+            if (table.properties.name === tableName) {
+                for await (const indexKey of Object.keys(table.index)) {
+                    let index: Index = table.index[indexKey]
+                    if (indexName === index.name) {
+                        return index
+                    }
+                }
+            }
+        }
+        return undefined
+    }
+
     async migration(config: GenerateConfig) {
         // console.log("DO migration for laravel")
         let historyList: History[];
@@ -94,10 +151,7 @@ export class LaravelGenerator {
         try {
             let page = 0
             let limit = 1
-            if (config.tag != '--latest') {
-                limit = 30
-            }
-            var respond = await axios.get(`http://localhost:8081/api/v1/integration/access?tag=${config.tag}&token=${config.token}&page=${page}&limit=${limit}`)
+            var respond = await axios.get(`https://us.dynobird.com/api/v1/integration/access?tag=--latest&token=${config.token}&page=${page}&limit=${limit}`)
             if (respond.data.success === false) {
                 console.log(chalk.red(" Error : " + respond.data.message))
                 process.exit(1)
@@ -120,7 +174,15 @@ export class LaravelGenerator {
         let thisHistoryKey = -1
         for await (const thisHistory of historyList) {
             if (!thisHistory.name || thisHistory.name.trim() == '') {
-                thisHistory.name = this.getRandomeFakeName(moment(thisHistory.createdAt).get('second'))
+                let fakerName = this.getRandomeFakeName(moment(thisHistory.createdAt).get('second'))
+                const name = await prompts({
+                    type: 'text',
+                    name: 'value',
+                    message: 'Migration name ?',
+                    initial: fakerName,
+                });
+
+                thisHistory.name = name.value
             }
             thisHistoryKey++;
             let dateFormated = moment(thisHistory.createdAt).format("YYYY_MM_DD_HHmmss")
