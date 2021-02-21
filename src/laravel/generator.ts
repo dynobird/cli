@@ -125,6 +125,25 @@ export class LaravelGenerator {
         return undefined
     }
 
+    async getOldIndex(oldHistory: History, tableName: string, indexName: string) {
+        if (!oldHistory) {
+            return undefined
+        }
+
+        for await (const tableKey of Object.keys(oldHistory.design.table)) {
+            let table: Table = oldHistory.design.table[tableKey]
+            if (table.properties.name === tableName) {
+                for await (const indexKey of Object.keys(table.index)) {
+                    let index: Index = table.index[indexKey]
+                    if (indexName === index.name) {
+                        return index
+                    }
+                }
+            }
+        }
+        return undefined
+    }
+
     async migration(config: GenerateConfig) {
         // console.log("DO migration for laravel")
         let historyList: History[];
