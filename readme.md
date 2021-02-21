@@ -1,5 +1,10 @@
-# Intorduction [beta-0.0.8]
+# Intorduction [0.0.12]
 Dynobird.com is database designer for web developer. So every line of code always think to make web developer easy in work. CLI tools is one of developer needs. We provide it with full support for community.
+
+youtube :
+
+[![dynobird.com demo video](https://img.youtube.com/vi/wtq0_OuL7cM/0.jpg)](https://www.youtube.com/watch?v=wtq0_OuL7cM)
+
 # Install
 [dynobird](https://dynobird.com) cli must install under nodeJS and npm. If you don't have npm and nodeJS follow this tutorial https://nodejs.org/en/download/
 
@@ -12,7 +17,7 @@ npm i -g dynobird
 [dynobird](https://dynobird.com) CLI is build on top of nodeJS. NodeJS required to install in Operating system. 
 [dynobird](https://dynobird.com) CLI required token to access your project. Follow this picture for copy your project token.
 
-<img src="https://github.com/dynobird/cli/raw/master/docs/img/token.png" width="500px">
+<img src="https://github.com/dynobird/cli/raw/master/docs/img/token.png" width="400px">
 
 ## dynobird.json
 this is configuration for project information and token for generating migration. This file can generate with command ```dynobird init```
@@ -29,7 +34,6 @@ this is configuration for project information and token for generating migration
 ## init
 ```$ dynobird init``` is command for initial dynobird.json if empty in project.
 
-
 <img src="https://github.com/dynobird/cli/raw/master/docs/img/dynobird-init.png" width="400px">
 
 ## migration
@@ -37,10 +41,13 @@ this is configuration for project information and token for generating migration
 
 <img src="https://github.com/dynobird/cli/raw/master/docs/img/dynobird-generate-migration.png" width="400px">
 
+youtube :
+https://www.youtube.com/watch?v=owpAH5PyfLE
 
 ## import
 ```$ dynobird import``` is command for import database design from existing database.
 
-![token image](./docs/img/database-import.png "Dynobird import project")
+<img src="https://github.com/dynobird/cli/raw/master/docs/img/database-import.png" width="400px">
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/qiG_21WRQ6A" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+youtube :
+https://www.youtube.com/watch?v=qiG_21WRQ6A
