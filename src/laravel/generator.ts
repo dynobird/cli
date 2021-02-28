@@ -19,6 +19,7 @@ import {
 import moment from "moment"
 import fs from "fs"
 import chalk from "chalk"
+import { Migration } from "./migration";
 
 export class LaravelGenerator {
     fakeName = [
@@ -148,21 +149,21 @@ export class LaravelGenerator {
         // console.log("DO migration for laravel")
         let historyList: History[];
         console.log(chalk.yellow(" Fetching data...."))
+        var thisHistory:History;
         try {
             let page = 0
             let limit = 1
-            var respond = await axios.get(`https://us.dynobird.com/api/v1/integration/access?tag=--latest&token=${config.token}&page=${page}&limit=${limit}`)
+            var respond = await axios.get(`http://localhost:8081/api/v1/integration/access?tag=--latest&token=${config.token}&page=${page}&limit=${limit}`)
             if (respond.data.success === false) {
                 console.log(chalk.red(" Error : " + respond.data.message))
                 process.exit(1)
             }
-            historyList = respond.data.payload.history
+            thisHistory = respond.data.payload.history[0]
         } catch (error) {
             console.log(chalk.red(" Error : " + error.message))
             process.exit(1)
         }
 
-        let projectProperties = respond.data.payload.properties
         console.log(chalk.green(" Fetching finish 🎉"))
         console.log(chalk.grey('-----------------------------------------'))
         console.log(chalk.green(` Project  name     : `) + respond.data.payload.properties.name)
@@ -172,7 +173,7 @@ export class LaravelGenerator {
         console.log(chalk.grey('-----------------------------------------'))
 
         let thisHistoryKey = -1
-        for await (const thisHistory of historyList) {
+        // for await (const thisHistory of historyList) {
             if (!thisHistory.name || thisHistory.name.trim() == '') {
                 let fakerName = this.getRandomeFakeName(moment(thisHistory.createdAt).get('second'))
                 const name = await prompts({
@@ -185,18 +186,18 @@ export class LaravelGenerator {
                 thisHistory.name = name.value
             }
             thisHistoryKey++;
-            let dateFormated = moment(thisHistory.createdAt).format("YYYY_MM_DD_HHmmss")
+            let dateFormated = moment(thisHistory.createdAt).utc().format("YYYY_MM_DD_HHmmss")
             let historyNameFormated = snakeCase(thisHistory.name)
             let migrationFileName = `${dateFormated}_${historyNameFormated}`
             let migrationClassName = pascalCase(thisHistory.name)
-            // console.log(migrationFileName)
             let up = ''
             let fullForeignKeyScript = "";
             let fullIndexScript = "";
             let fullDeleteScript = "";
             let fullPrimaryScript = "";
-            const oldHistory = historyList[thisHistoryKey - 1];
-            console.log(chalk.yellow(" Generating : " + historyNameFormated))
+            // const oldHistory = historyList[thisHistoryKey - 1];
+            console.log(chalk.green(" Read migration in existing database..."))
+            const oldHistory: History | undefined = await new Migration().getOldHistory(config)            
             /**
              * Create table and change column
              */
@@ -534,7 +535,8 @@ export class LaravelGenerator {
 
             let migrationScript = await new Template().migrationTemplate(migrationClassName, up, '');
             await new FileMaker().makeMigration(config, migrationFileName, migrationScript);
-        }
+        // }
         console.log(chalk.bgGreen(chalk.black(" Status     : Generate migration completed ✔  ")))
+        process.exit(1)
     }
 }

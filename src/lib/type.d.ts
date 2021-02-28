@@ -4,6 +4,14 @@ export interface GenerateConfig {
     framework: string
     migrationsDir: string
     entitiesDir: string
+    db: {
+        type: string,
+        host: string,
+        user: string,
+        password: string,
+        database: string,
+        port: 3306
+    }
 }
 
 export interface History {

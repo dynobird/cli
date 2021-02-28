@@ -48,10 +48,12 @@ async function main() {
             console.log(chalk.red(" Key token not found"))
             process.exit(1)
         }
-
-        new Generator().migration(dynoConfig)
+        await new Generator().migration(dynoConfig)
     }
-    else if (command === 'import') {
+    else if (command === 'migration:import') {
+        
+    }
+    else if (command === 'database:import') {
         new Import().main()
     }
     else if (command === 'init') {
@@ -61,9 +63,7 @@ async function main() {
             console.log(chalk.red(" dynobird.json found in this directory"))
             process.exit(1)
         }
-        new Generator().dynobirdJSON(dynoJsonPath)
-
-
+        await new Generator().dynobirdJSON(dynoJsonPath)
     } else {
         console.log(chalk.red(" Command not found "))
     }
