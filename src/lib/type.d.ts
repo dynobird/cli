@@ -86,7 +86,18 @@ export interface Column {
     unique: boolean,
     default: null | string,
     comment: string,
-    option: {},
+    option: {
+        autoIncrement?: {
+            name: "Auto Increment",
+            type: "YES_NO",
+            value: boolean
+        },
+        unsigned?: {
+            name: "Unsigned",
+            type: "YES_NO",
+            value: boolean
+        }
+    },
     style: {
         shadowBlur: number,
         shadowColor: string
