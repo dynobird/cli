@@ -19,8 +19,6 @@
   "license": "ISC",
   "dependencies": {
     "@prettier/plugin-php": "^0.16.1",
-    "@types/mysql": "^2.15.17",
-    "@types/prettier": "^2.2.0",
     "axios": "^0.21.1",
     "btoa": "^1.2.1",
     "chalk": "^4.1.0",
@@ -33,9 +31,12 @@
     "mysqldump": "^3.2.0",
     "ora": "^5.3.0",
     "prettier": "^2.2.1",
-    "prompts": "^2.4.0"
+    "prompts": "^2.4.0",
+    "semver": "^7.3.4"
   },
   "devDependencies": {
+    "@types/prettier": "^2.2.0",
+    "@types/semver": "^7.3.4",
     "@types/btoa": "^1.2.3",
     "@types/prompts": "^2.0.9",
     "@types/node": "^14.14.25",

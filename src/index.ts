@@ -5,19 +5,46 @@ import fs from "fs"
 import { GenerateConfig } from "./lib/type";
 import chalk from "chalk";
 import { Import } from './import'
-// program
-//     .version('0.0.1')
-//     .description("dynobird cli")
-//     .option('migration:generate', 'generate migration based on tag of your history')
-//     .option('import', 'import database to design')
-//     .option('init', 'For initital dynobird.json configuration project')
-//     .parse(process.argv);
+import { Utill } from "./util/utill";
+import semver from "semver"
 
-// if (!process.argv.slice(2).length) {
-//     program.outputHelp();
-// }
 
 async function main() {
+
+    let rawPackage = fs.readFileSync(__dirname + "/../package.json")
+
+    if (!rawPackage) {
+        console.log(chalk.red(" Package JSON missing"))
+        process.exit(1)
+    }
+
+
+    let jsonPackage = JSON.parse(rawPackage.toString())
+    let installedVersion = jsonPackage.version
+
+    program
+        .version(installedVersion)
+        .description("dynobird cli")
+        .option('migration:generate', 'generate migration based of your history and migration')
+        .option('migration:import', 'import existing migration to dynobird')
+        .option('database:import', 'import database to design')
+        .option('init', 'For initital dynobird.json configuration project')
+        .parse(process.argv);
+
+
+
+    console.log(chalk.green(" Checking last version..."))
+    let latestVersion = await new Utill().getLastVersion()
+    console.log(chalk.green(` Last version : ${latestVersion}`))
+    console.log(chalk.green(` Installed version : ${installedVersion}`))
+
+    if (semver.lt(installedVersion, latestVersion)) {
+        console.log(chalk.yellow(` Installed version is out date `))
+    } else {
+        console.log(chalk.green(` Installed version is up to date date ✔ `))
+    }
+    console.log(chalk.grey('-----------------------------------------'))
+
     let command = process.argv[2]
 
     if (command === 'migration:generate') {
@@ -51,7 +78,7 @@ async function main() {
         await new Generator().migration(dynoConfig)
     }
     else if (command === 'migration:import') {
-        
+
     }
     else if (command === 'database:import') {
         new Import().main()
@@ -66,6 +93,7 @@ async function main() {
         await new Generator().dynobirdJSON(dynoJsonPath)
     } else {
         console.log(chalk.red(" Command not found "))
+        program.outputHelp();
     }
 }
 main();
