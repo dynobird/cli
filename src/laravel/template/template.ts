@@ -110,19 +110,45 @@ export class Template {
 
     changeColumn(thisColumn: Column) {
         let columnScript = ""
-        // console.log("MASUKK columnnnn " + thisColumn.dataType)
         let tmp = thisColumn.dataType.split('(')
         let length = 0
-        let cleanColumnType = tmp[0]
+        let cleanColumnType = this.columnMapping(tmp[0])
         if (tmp[1]) {
-            // console.log("no have lenth")
             length = parseInt(tmp[1].replace(")", "").trim())
         }
+
+
         if (length === 0) {
             columnScript += `$table->${cleanColumnType}('${thisColumn.name}')`
         } else {
-            columnScript += `$table->${cleanColumnType}('${thisColumn.name}', ${length})`
+            switch (cleanColumnType) {
+                case 'bigInteger':
+                case 'integer':
+                case 'mediumInteger':
+                case 'tinyInteger':
+                    columnScript += `$table->${cleanColumnType}('${thisColumn.name}')`
+                    break;
+                default:
+                    columnScript += `$table->${cleanColumnType}('${thisColumn.name}', ${length})`
+                    break;
+            }
         }
+
+
+        if (thisColumn.option) {
+            if (thisColumn.option.autoIncrement) {
+                if (thisColumn.option.autoIncrement.value === true) {
+                    columnScript += '->autoIncrement()';
+                }
+            }
+            if (thisColumn.option.unsigned) {
+                if (thisColumn.option.unsigned.value === true) {
+                    columnScript += '->unsigned()';
+                }
+            }
+        }
+
+
         if (thisColumn.unique === true) {
             columnScript += '->unique()';
         }
@@ -189,26 +215,31 @@ export class Template {
             year: ["YEAR"],
         }
 
+        let laravelDataType;
         for (const mappingKey of Object.keys(mappingList)) {
             let mapping = mappingList[mappingKey]
             if (mapping.indexOf(columnTypeDynoBird) >= 0) {
-                return mappingKey
+                laravelDataType = mappingKey
             }
         }
 
-        throw new Error("Data type |" + columnTypeDynoBird + "| not found in cli mapping laravel data type")
+        if (!laravelDataType) {
+            throw new Error("Data type |" + columnTypeDynoBird + "| not found in cli mapping laravel data type")
+        }
+        return laravelDataType
     }
+
+
 
     addColumn(thisColumn: Column) {
         let columnScript = ""
-        // console.log("MASUKK columnnnn " + thisColumn.dataType)
         let tmp = thisColumn.dataType.split('(')
         let length = 0
         let cleanColumnType = this.columnMapping(tmp[0])
         if (tmp[1]) {
-            // console.log("no have lenth")
             length = parseInt(tmp[1].replace(")", "").trim())
         }
+
         if (length === 0) {
             columnScript += `$table->${cleanColumnType}('${thisColumn.name}')`
         } else {
@@ -223,8 +254,23 @@ export class Template {
                     columnScript += `$table->${cleanColumnType}('${thisColumn.name}', ${length})`
                     break;
             }
-
         }
+
+
+        if (thisColumn.option) {
+            if (thisColumn.option.autoIncrement) {
+                if (thisColumn.option.autoIncrement.value === true) {
+                    columnScript += '->autoIncrement()';
+                }
+            }
+            if (thisColumn.option.unsigned) {
+                if (thisColumn.option.unsigned.value === true) {
+                    columnScript += '->unsigned()';
+                }
+            }
+        }
+
+
         if (thisColumn.unique === true) {
             columnScript += '->unique()';
         }
@@ -276,7 +322,7 @@ export class Template {
         for await (const thisColumnKey of Object.keys(table.column)) {
             let thisColumn: Column = table.column[thisColumnKey]
 
-            if (thisColumn.primary === true && thisColumn.dataType !== 'id') {
+            if (thisColumn.primary === true && thisColumn.dataType !== 'id' && thisColumn.option.autoIncrement?.value !== true) {
                 primaryColumn += `'${thisColumn.name}', `
             }
         }

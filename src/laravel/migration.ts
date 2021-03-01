@@ -34,6 +34,10 @@ export class Migration {
 
         connection.end();
 
+        if (!data[0]) {
+            return undefined
+        }
+        
         return data[0]['migration']
     }
 

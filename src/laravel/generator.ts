@@ -276,9 +276,11 @@ export class LaravelGenerator {
                     (oldColumn.unique !== thisColumn.unique) ||
                     (oldColumn.default !== thisColumn.default) ||
                     (oldColumn.comment !== thisColumn.comment) ||
-                    (oldColumn.dataType !== thisColumn.dataType)
+                    (oldColumn.dataType !== thisColumn.dataType) ||
+                    (oldColumn.option.autoIncrement?.value !== thisColumn.option.autoIncrement?.value)||
+                    (oldColumn.option.unsigned?.value !== thisColumn.option.unsigned?.value)
                 ) {
-                    columnChangeScript += await new Template().changeColumn(oldColumn)
+                    columnChangeScript += await new Template().changeColumn(thisColumn)
                 }
 
             }
@@ -359,7 +361,7 @@ export class LaravelGenerator {
                 for await (const thisColumnKey of Object.keys(thisTable.column)) {
                     let thisColumn: Column = thisTable.column[thisColumnKey]
 
-                    if (thisColumn.primary === true && thisColumn.dataType !== 'id') {
+                    if (thisColumn.primary === true && thisColumn.dataType !== 'id' && thisColumn.option.autoIncrement?.value !== true) {
                         primaryChangeScript += `'${thisColumn.name}', `
                     }
                 }
