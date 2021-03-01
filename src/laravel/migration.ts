@@ -3,6 +3,7 @@ import { GenerateConfig, History } from "../lib/type";
 import axios from "axios"
 import mysqldump from 'mysqldump';
 import moment from 'moment'
+import chalk from "chalk"
 
 export class Migration {
     async getLastMigration(config: GenerateConfig) {
@@ -37,7 +38,7 @@ export class Migration {
         if (!data[0]) {
             return undefined
         }
-        
+
         return data[0]['migration']
     }
 
@@ -46,8 +47,6 @@ export class Migration {
         message: string,
         payload: History
     }> {
-
-        console.log(createdAt)
         let respond = await axios.get(`http://localhost:8081/api/v1/integration/getHistoryByCreatedAt?createdAt=${createdAt}&token=${token}`)
         return respond.data
     }
@@ -145,7 +144,8 @@ export class Migration {
         let respond = await this.getHistoryByCreatedAt(formated, config.token)
 
         if (respond.success === false) {
-            return undefined
+            console.log(chalk.red(` Migration ${lastMigration} not found in dynobird history`))
+            process.exit(1)
         }
 
         return respond.payload
