@@ -32,7 +32,7 @@ export class Generator {
 
         const spinner = ora(' Validating project',).start()
         spinner.color = 'yellow'
-        var respond = await axios.get(`https://us.dynobird.com/api/v1/integration/access?tag=--latest&token=${tokenResponse.token}`)
+        var respond = await axios.get(`http://localhost:8081/api/v1/integration/access?tag=--latest&token=${tokenResponse.token}`)
         if (respond.data.success === false) {
             console.log(chalk.red(" Error : " + respond.data.message))
             process.exit(1)
@@ -96,14 +96,71 @@ export class Generator {
 
 
 
+        const databaseType = await prompts({
+            type: 'select',
+            name: 'value',
+            choices: [
+                { title: 'MY_SQL', value: 'MY_SQL', disabled: false },
+                { title: 'SQL_SERVER', value: 'SQL_SERVER', disabled: true },
+                { title: 'POSTGRE_SQL', value: 'POSTGRE_SQL', disabled: true },
+            ],
+            initial: 0,
+            message: 'What is your database type ?'
+        });
 
 
-        let dynobirdJSON = {
+
+        const databaseHost = await prompts({
+            type: 'text',
+            name: 'value',
+            message: 'Database host :',
+            initial: 'localhost',
+        });
+
+
+        const databaseUser = await prompts({
+            type: 'text',
+            name: 'value',
+            message: 'Database user :',
+            initial: 'root',
+        });
+
+        const databasePassword = await prompts({
+            type: 'password',
+            name: 'value',
+            message: 'Database password :',
+            initial: '',
+        });
+
+        const databasePort = await prompts({
+            type: 'number',
+            name: 'value',
+            message: 'Database port?',
+            initial: 3306,
+        });
+
+
+        const databaseName = await prompts({
+            type: 'text',
+            name: 'value',
+            message: 'Database name :',
+            initial: 'my_db',
+        });
+
+        let dynobirdJSON: GenerateConfig = {
             entitiesDir: entitiesDir.value,
             migrationsDir: migrationDir.migrationDir,
             framework: framework.framework,
             frameworkVersion: frameworkVersion.version,
-            token: tokenResponse.token
+            token: tokenResponse.token,
+            db: {
+                type: databaseType.value,
+                host: databaseHost.value,
+                user: databaseUser.value,
+                password: databasePassword.value,
+                database: databaseName.value,
+                port: databasePort.value
+            }
         }
 
         fs.writeFileSync(dynoJsonPath, jsonFormat(dynobirdJSON))

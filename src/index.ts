@@ -9,6 +9,68 @@ import { Utill } from "./util/utill";
 import semver from "semver"
 import { Migration } from "./laravel/migration";
 
+function checkDynobirdJSON(dynoConfig: GenerateConfig) {
+
+    if (dynoConfig.entitiesDir === undefined) {
+        console.log(chalk.red(" Key entitiesDir not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.migrationsDir === undefined) {
+        console.log(chalk.red(" Key migrationDir not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.framework === undefined) {
+        console.log(chalk.red(" Key framework not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.frameworkVersion === undefined) {
+        console.log(chalk.red(" Key frameworkVersion not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.token === undefined) {
+        console.log(chalk.red(" Key token not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.db === undefined) {
+        console.log(chalk.red(" Object db not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.db.user === undefined) {
+        console.log(chalk.red(" Key db.user not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.db.type === undefined) {
+        console.log(chalk.red(" Key db.type not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.db.port === undefined) {
+        console.log(chalk.red(" Key db.port not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.db.password === undefined) {
+        console.log(chalk.red(" Key db.password not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (dynoConfig.db.host === undefined) {
+        console.log(chalk.red(" Key db.host not found in dynobird.json"))
+        process.exit(1)
+    }
+
+    if (!dynoConfig.db.database) {
+        console.log(chalk.red(" Key db.database not found in dynobird.json"))
+        process.exit(1)
+    }
+}
 
 async function main() {
 
@@ -40,7 +102,8 @@ async function main() {
     console.log(chalk.green(` Installed version : ${installedVersion}`))
 
     if (semver.lt(installedVersion, latestVersion)) {
-        console.log(chalk.yellow(` Installed version is out date `))
+        console.log(chalk.red(` Installed version is out date `))
+        console.log(chalk.red(` Run npm update -g dynobird `))
     } else {
         console.log(chalk.green(` Installed version is up to date date ✔ `))
     }
@@ -62,20 +125,8 @@ async function main() {
             console.log(chalk.red(" Invalid dynobird.json"))
             process.exit(1)
         }
-        if (!dynoConfig.entitiesDir) {
-            console.log(chalk.red(" Key entitiesDir not found"))
-            process.exit(1)
-        }
 
-        if (!dynoConfig.migrationsDir) {
-            console.log(chalk.red(" Key migrationDir not found"))
-            process.exit(1)
-        }
-
-        if (!dynoConfig.token) {
-            console.log(chalk.red(" Key token not found"))
-            process.exit(1)
-        }
+        checkDynobirdJSON(dynoConfig)
         await new Generator().migration(dynoConfig)
     }
     else if (command === 'migration:import') {
@@ -92,6 +143,7 @@ async function main() {
             console.log(chalk.red(" Invalid dynobird.json"))
             process.exit(1)
         }
+        checkDynobirdJSON(dynoConfig)
         new Migration().import(dynoConfig)
     }
     else if (command === 'database:import') {
