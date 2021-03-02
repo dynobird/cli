@@ -4,6 +4,8 @@ import axios from "axios"
 import mysqldump from 'mysqldump';
 import moment from 'moment'
 import chalk from "chalk"
+import { Import } from "../import"
+import btoa from 'btoa'
 
 export class Migration {
     async getLastMigration(config: GenerateConfig) {
@@ -60,79 +62,6 @@ export class Migration {
     }
 
 
-    async getSqlCreateMysql(data: {
-        host: string,
-        user: string,
-        password: string,
-        databaseName: string,
-        port: number
-    }) {
-        const result = await mysqldump({
-            connection: {
-                host: data.host,
-                user: data.user,
-                password: data.password,
-                database: data.databaseName,
-                port: data.port
-            },
-            // dumpToFile: './dump.sql',
-            dump: {
-                tables: [],
-                excludeTables: false,
-                schema: {
-                    format: false,
-                    autoIncrement: true,
-                    engine: true,
-                    table: {
-                        ifNotExist: true,
-                        dropIfExist: false,
-                        charset: true,
-                    },
-                    view: {
-                        createOrReplace: true,
-                        algorithm: false,
-                        definer: false,
-                        sqlSecurity: false,
-                    },
-                },
-                data: {
-                    format: true,
-                    verbose: true,
-                    lockTables: false,
-                    includeViewData: false,
-                    where: {},
-                    returnFromFunction: false,
-                    maxRowsPerInsertStatement: 1,
-                },
-                trigger: {
-                    delimiter: ';;',
-                    dropIfExist: true,
-                    definer: false,
-                },
-            },
-        });
-        let cleanSqlSchema = ""
-
-        if (result.dump.schema === null) {
-            throw new Error("Error : sql empty")
-        }
-
-        let sqlByLine = result.dump.schema.match(/[^\r\n]+/g);
-        if (sqlByLine === null) {
-            throw new Error("Error : sql empty")
-        }
-
-        for (let i = 0; i < sqlByLine.length; i++) {
-            const line = sqlByLine[i]
-            if (line.trim().indexOf('#') === 0) {
-                continue;
-            }
-            cleanSqlSchema += `${line}\r\n`
-        }
-
-        return cleanSqlSchema
-    }
-
     async getOldHistory(config: GenerateConfig): Promise<History | undefined> {
         let lastMigration: string = await this.getLastMigration(config)
         if (!lastMigration) {
@@ -149,5 +78,48 @@ export class Migration {
         }
 
         return respond.payload
+    }
+
+
+    async import(config: GenerateConfig) {
+
+        await new Import().validating(config.token)
+
+        console.log(chalk.yellow(" Get last migration...."))
+        let lastMigration: string = await this.getLastMigration(config)
+        if (!lastMigration) {
+            console.log(chalk.red(` Last migration not found in database`))
+            console.log(chalk.red(` Details :`))
+            console.log(chalk.red(` Host      :${config.db.host}`))
+            console.log(chalk.red(` Port      :${config.db.port}`))
+            console.log(chalk.red(` Type      :${config.db.type}`))
+            console.log(chalk.red(` Username  :${config.db.user}`))
+            console.log(chalk.red(` Password  :${config.db.password}`))
+            console.log(chalk.red(` Database  :${config.db.database}`))
+            process.exit(1)
+        }
+        let lastMigrationDateTime = lastMigration.substr(0, 17)
+        let dateTime = moment(lastMigrationDateTime, 'YYYY_MM_DD_HHmmss')
+        let formated = dateTime.format('YYYY-MM-DD HH:mm:ss')
+
+        console.log(chalk.yellow(" Dumping SQL create...."))
+
+        console.log(chalk.yellow(" Importing migration...."))
+        let sql = await new Import().getSqlCreateMysql({
+            databaseName: config.db.database,
+            host: config.db.host,
+            password: config.db.password,
+            port: config.db.port,
+            user: config.db.user
+        })
+
+        let response = await axios.post(`http://localhost:8081/api/v1/integration/importSql`, {
+            token: config.token,
+            sql: btoa(sql),
+            createdAt: formated
+        })
+
+        console.log(chalk.green(" Import finish 🎉"))
+
     }
 }

@@ -7,6 +7,7 @@ import chalk from "chalk";
 import { Import } from './import'
 import { Utill } from "./util/utill";
 import semver from "semver"
+import { Migration } from "./laravel/migration";
 
 
 async function main() {
@@ -78,7 +79,20 @@ async function main() {
         await new Generator().migration(dynoConfig)
     }
     else if (command === 'migration:import') {
-
+        let thisDir = process.cwd()
+        let dynoJsonPath = `${thisDir}/dynobird.json`
+        if (!fs.existsSync(dynoJsonPath)) {
+            await new Generator().dynobirdJSON(dynoJsonPath)
+        }
+        let raw = fs.readFileSync(dynoJsonPath);
+        let dynoConfig: GenerateConfig
+        try {
+            dynoConfig = JSON.parse(raw.toString())
+        } catch (error) {
+            console.log(chalk.red(" Invalid dynobird.json"))
+            process.exit(1)
+        }
+        new Migration().import(dynoConfig)
     }
     else if (command === 'database:import') {
         new Import().main()
