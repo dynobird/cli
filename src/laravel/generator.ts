@@ -152,7 +152,7 @@ export class LaravelGenerator {
         try {
             let page = 0
             let limit = 1
-            var respond = await axios.get(`http://localhost:8081/api/v1/integration/access?tag=--latest&token=${config.token}&page=${page}&limit=${limit}`)
+            var respond = await axios.get(`https://app.dynobird.com/api/v1/integration/access?tag=--latest&token=${config.token}&page=${page}&limit=${limit}`)
             if (respond.data.success === false) {
                 console.log(chalk.red(" Error : " + respond.data.message))
                 process.exit(1)

@@ -158,7 +158,7 @@ export class Import {
     }
 
     async push(sql: string, token: string) {
-        let response = await axios.post(`http://localhost:8081/api/v1/integration/importSql`, {
+        let response = await axios.post(`https://app.dynobird.com/api/v1/integration/importSql`, {
             token: token,
             sql: btoa(sql)
         })
@@ -170,7 +170,7 @@ export class Import {
         try {
             let page = 0
             let limit = 1
-            var respond = await axios.get(`http://localhost:8081/api/v1/integration/access?tag=--latest&token=${token}&page=${page}&limit=${limit}`)
+            var respond = await axios.get(`https://app.dynobird.com/api/v1/integration/access?tag=--latest&token=${token}&page=${page}&limit=${limit}`)
             if (respond.data.success === false) {
                 console.log(chalk.red(" Error : " + respond.data.message))
                 process.exit(1)

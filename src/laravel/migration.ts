@@ -49,12 +49,12 @@ export class Migration {
         message: string,
         payload: History
     }> {
-        let respond = await axios.get(`http://localhost:8081/api/v1/integration/getHistoryByCreatedAt?createdAt=${createdAt}&token=${token}`)
+        let respond = await axios.get(`https://app.dynobird.com/api/v1/integration/getHistoryByCreatedAt?createdAt=${createdAt}&token=${token}`)
         return respond.data
     }
 
     async convertCreateSqlToDesign(sql: string, token: string) {
-        let response = await axios.post(`http://localhost:8081/api/v1/integration/convertSqlToDesign`, {
+        let response = await axios.post(`https://app.dynobird.com/api/v1/integration/convertSqlToDesign`, {
             token: token,
             sql: btoa(sql)
         })
@@ -113,7 +113,7 @@ export class Migration {
             user: config.db.user
         })
 
-        let response = await axios.post(`http://localhost:8081/api/v1/integration/importSql`, {
+        let response = await axios.post(`https://app.dynobird.com/api/v1/integration/importSql`, {
             token: config.token,
             sql: btoa(sql),
             createdAt: formated

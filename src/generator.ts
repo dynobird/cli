@@ -32,7 +32,7 @@ export class Generator {
 
         const spinner = ora(' Validating project',).start()
         spinner.color = 'yellow'
-        var respond = await axios.get(`http://localhost:8081/api/v1/integration/access?tag=--latest&token=${tokenResponse.token}`)
+        var respond = await axios.get(`https://app.dynobird.com/api/v1/integration/access?tag=--latest&token=${tokenResponse.token}`)
         if (respond.data.success === false) {
             console.log(chalk.red(" Error : " + respond.data.message))
             process.exit(1)
