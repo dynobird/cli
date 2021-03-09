@@ -1,6 +1,6 @@
 {
   "name": "dynobird",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "",
   "main": "./dist/index.js",
   "bin": {
@@ -15,7 +15,11 @@
     "i-local": "tsc -p . && npm i -g",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dynobird/cli/"
+  },
+  "author": "dynobird.com",
   "license": "ISC",
   "dependencies": {
     "@prettier/plugin-php": "^0.16.1",
