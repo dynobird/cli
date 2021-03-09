@@ -23,11 +23,19 @@ npm i -g dynobird
 this is configuration for project information and token for generating migration. This file can generate with command ```dynobird init```
 ```json
 {
-  "entitiesDir": "app/Models",
-  "migrationsDir": "database/migrations",
-  "framework": "laravel",
-  "frameworkVersion": "8",
-  "token": "6ebb251fe2e307536de653468098a2d8a87d1026e8c3800731d961317405954e3364c555c8a59cd4410ad19d132d045354e5"
+    "entitiesDir": "model",
+    "migrationsDir": "migration",
+    "framework": "laravel",
+    "frameworkVersion": "8",
+    "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "db": {
+        "type": "MY_SQL",
+        "host": "localhost",
+        "user": "root",
+        "password": "root",
+        "database": "laravel",
+        "port": 3306
+    }
 }
 ```
 
@@ -36,7 +44,20 @@ this is configuration for project information and token for generating migration
 
 <img src="https://github.com/dynobird/cli/raw/master/docs/img/dynobird-init.png" width="400px">
 
-## migration
+## Migration strategy
+This is command to work with dynobird migrtion. There are two strategy to use this migration tools from dynobird. 
+Strategy :
+* existing project
+  In existing project need to import in first. Use `migration:import` for import all database dasign and migration version  to  dynobird. After all is imported work your design in dynobird.com. If need to generate code migration use `migration:generate` it will generate latest migration to project directory.
+* new project 
+  For new project is easy to integrate with it. Just generate with this command `migration:generate` every need to write migration code.
+
+## migration:import
+```$ dynobird migration:import``` is command to import migration and database to dynobird. This is command for integrate existing project with dynobird.
+
+<img src="https://github.com/dynobird/cli/raw/master/docs/img/migration-import.png" width="400px">
+
+## migration:generate
 ```$ dynobird migration:generate``` is command for generate database design to database migration.
 
 <img src="https://github.com/dynobird/cli/raw/master/docs/img/dynobird-generate-migration.png" width="400px">
@@ -44,8 +65,8 @@ this is configuration for project information and token for generating migration
 youtube :
 https://www.youtube.com/watch?v=owpAH5PyfLE
 
-## import
-```$ dynobird import``` is command for import database design from existing database.
+## database:import
+```$ dynobird database:import``` is command for import database design from existing database without import migration.
 
 <img src="https://github.com/dynobird/cli/raw/master/docs/img/database-import.png" width="400px">
 

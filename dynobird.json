@@ -4,5 +4,12 @@
     "framework": "laravel",
     "frameworkVersion": "8",
     "token": "87969e84486f3eeaf225f7ae0421db5cc6323ba04b3e174814ade0f0cd0db73e6d3bd3881da7583dbbd85a1c47c15aa2d21d",
-    "tag": "%%"
+    "db": {
+        "type": "MY_SQL",
+        "host": "localhost",
+        "user": "root",
+        "password": "password",
+        "database": "laravel",
+        "port": 3306
+    }
 }

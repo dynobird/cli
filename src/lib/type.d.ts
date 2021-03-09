@@ -4,6 +4,14 @@ export interface GenerateConfig {
     framework: string
     migrationsDir: string
     entitiesDir: string
+    db: {
+        type: string,
+        host: string,
+        user: string,
+        password: string,
+        database: string,
+        port: 3306
+    }
 }
 
 export interface History {
@@ -78,7 +86,18 @@ export interface Column {
     unique: boolean,
     default: null | string,
     comment: string,
-    option: {},
+    option: {
+        autoIncrement?: {
+            name: "Auto Increment",
+            type: "YES_NO",
+            value: boolean
+        },
+        unsigned?: {
+            name: "Unsigned",
+            type: "YES_NO",
+            value: boolean
+        }
+    },
     style: {
         shadowBlur: number,
         shadowColor: string
